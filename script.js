@@ -17,8 +17,12 @@ start.addEventListener("click", () => {
     output.innerHTML = line
     car = 0
     clearInterval(interval)
-
-    interval = setInterval(nextStepSum, 200)
+    if(line.indexOf("+") != -1){
+        interval = setInterval(nextStepSum, 200)
+    }
+    else {
+        interval = setInterval(nextStepMult, 200)
+    }
     state = "q1"
 })
 
@@ -27,6 +31,12 @@ startMan.addEventListener("click", () => {
     output.innerHTML = line
     car = 0
     clearInterval(interval)
+    if(line.indexOf("+") != -1){
+        mode = "+"
+    }
+    else{
+        mode = "x"
+    }
     state = "q1"
 })
 
@@ -79,56 +89,83 @@ function nextStepSum(){
 
 function nextStepMult(){
     let c
+    console.log(state, c)
     switch(state){
         case "q1":
             car++
             c = line[car]
             if(c == "1"){
-                state = "q2"
                 line = line.replaceAt(car, "*")
-                break
+                state = "q2"
+            }
+            else if(c == "x"){
+                line = line.replaceAt(car, "*")
+            }
+            else if(c == "="){
+                line = line.replaceAt(car, "*")
+                clearInterval(interval)
             }
             break
         case "q2":
             car++
             c = line[car]
-            if(c == "x"){
+            if(c == "*"){
+                line = line.replaceAt(car, "1")
+            }
+            else if(c == "="){
                 state = "q3"
-                break
             }
             break
         case "q3":
-            car++
+            car--
             c = line[car]
             if(c == "1"){
                 line = line.replaceAt(car, "*")
                 state = "q4"
-                break
+            }
+            else if(c == "x"){
+                state = "q7"
             }
             break
         case "q4":
             car++
             c = line[car]
-            if(c == "*"){
-                line = line.replaceAt(car, "1")
+            if(c == "="){
                 state = "q5"
-                break
             }
             break
         case "q5":
-            car--
+            car++
             c = line[car]
             if(c == "*"){
                 line = line.replaceAt(car, "1")
-                break
-            }
-            if(c == "x"){
                 state = "q6"
             }
+            break
+        case "q6":
+            car--
+            c = line[car]
+            if(c == "="){
+                state = "q3"
+            }
+            break
+        case "q7":
+            car--
+            c = line[car]
+            if(c == "*"){
+                state = "q1"
+            }
+            break
     }   
+    output.innerHTML = line.substring(0, car) + `<span style="background-color: #f33">${line[car]}</span>` + line.substring(car + 1, line.length)
 
 }
 
 next.addEventListener("click", () => {
-    nextStepSum()
+    if(mode == "+"){
+        nextStepSum()
+    }
+    else{
+        nextStepMult()
+    }
 })
